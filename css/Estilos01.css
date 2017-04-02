@@ -1,0 +1,42 @@
+﻿/* Bootstrap */
+body {
+  padding-top: 50px;
+}
+
+/* Fin - Bootstrap */
+
+#divContenido {
+    padding: 0px 0px;
+}
+
+.contenedorContenido {
+    margin: 10px;
+}
+
+.Titulo {
+    background-color: white;
+    color:green;
+    font-size:x-large;
+}
+
+.Subtitulo {
+    background-color:green;
+    color: white;
+    font-size:large;
+}
+
+.FilaCabecera {
+    background-color:green;
+    color:white;
+}
+
+.FilaDatos {
+    background-color:white;
+    color:green;
+}
+
+.FilaDatos:hover {
+    background-color:yellow;
+    color:red;
+    cursor: pointer;
+}
