@@ -1,0 +1,212 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Zoneminder :: Agregar monitor</title>
+        <link href="css/Estilos01.css" rel="stylesheet" />
+        <!-- Bootstrap core CSS -->
+        <link href="css/bootstrap.css" rel="stylesheet">
+        
+    </head>
+	
+    <body>
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">ZoneMinder GUI</a>
+            </div>
+        </nav>
+        
+        
+        <div id="contenidoModulo" class="contenedorContenido">
+            <div class="panel panel-primary">
+                <div class="panel-heading">Agregar monitor</div>
+                
+                <div class="alert alert-danger"><span id="spnMensaje"></span></div>
+                
+                <div class="panel-body">
+                    <div id="divContenido">
+                        <form class="form-horizontal">
+
+                            <!-- Titulos de los tabs -->
+                            <ul id="menuTabs" class="nav nav-tabs" role="tablist">
+                                <li class="active"><a href="#general" id="tab_1" data-toggle="tab">General</a></li>
+                                <li><a href="#origen" id="tab_2" data-toggle="tab">Origen</a></li> 
+                                <!-- 
+                                <li><a href="#marcatiempo" id="tab_3" data-toggle="tab">Marca de tiempo</a></li>
+                                <li><a href="#bufers" id="tab_4" data-toggle="tab">Búfers</a></li>
+                                <li><a href="#misc" id="tab_5" data-toggle="tab">Misc</a></li>
+                                -->
+                            </ul>
+                            <!-- Contenidos de los tabs -->
+                            <div id="tab-content" class="tab-content">
+                                <div class="tab-pane fade active in contenedorContenido" id="tab_1">
+
+                                    <!-- Nombre del monitor -->
+                                    <div class="form-group">
+                                        <label for="Monitor[Name]" class="col-sm-2 control-label">Nombre</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control" id="Monitor[Name]">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Servidor -->
+                                    <div class="form-group">
+                                        <label for="Monitor[ServerId]" class="col-sm-2 control-label">Servidor</label>
+                                        <div class="col-sm-4">
+                                            <select id="Monitor[ServerId]" class="form-control">
+                                                <option value="" selected="selected">Ninguno</option>
+                                            </select>
+                                        </div>
+                                    </div> 
+
+                                    <!-- Tipo de origen -->
+                                    <div class="form-group">
+                                        <label for="Monitor[Type]" class="col-sm-2 control-label">Tipo de origen</label>
+                                        <div class="col-sm-4">
+                                            <select id="Monitor[Type]" class="form-control">
+                                                <option value="Local" selected="selected">Local</option>
+                                                <option value="Remote">Remoto</option>
+                                                <option value="File">Archivo</option>
+                                                <option value="Ffmpeg">Ffmpeg</option>
+                                                <option value="Libvlc">Libvcl</option>
+                                                <option value="cURL">cURL (Solo HTTP(S))</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Función -->
+                                    <div class="form-group">
+                                        <label for="Monitor[Function]" class="col-sm-2 control-label">Función</label>
+                                        <div class="col-sm-4">
+                                            <select id="Monitor[Function]" class="form-control">
+                                                <option value="None">Ninguno</option>
+                                                <option value="Monitor" selected="selected">Monitor</option>
+                                                <option value="Modect">Modect</option>
+                                                <option value="Record">Record</option>
+                                                <option value="Mocord">Mocord</option>
+                                                <option value="Nodect">Nodect</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Enabled -->
+                                    <div class="form-group">
+                                        <label for="Monitor[Enabled]" class="col-sm-2 control-label">Habilitado</label>
+                                        <div class="col-sm-4">
+                                            <div class="form-control">
+                                                <input type="checkbox" id="Monitor[Enabled]">
+                                            </div>
+                                        </div>  
+                                    </div>                                   
+
+                                </div>
+
+                                <div class="tab-pane fade" id="tab_2">
+                                    <!-- Protocolo remoto -->
+                                    <div class="form-group">
+                                        <label for="Monitor[Protocol]" class="col-sm-2 control-label">Protocolo remoto</label>
+                                        <div class="col-sm-4">
+                                            <select id="Monitor[Protocol]" class="form-control" onchange="actualizarMetodos();">
+                                                <option value="http">HTTP</option>
+                                                <option value="rtsp">RTSP</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Método remoto -->
+                                    <div class="form-group">
+                                        <label for="Monitor[Method]" class="col-sm-2 control-label">Método remoto</label>
+                                        <div class="col-sm-4">
+                                            <select id="Monitor[Method]" class="form-control">
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Nombre del host remoto -->
+                                    <div class="form-group">
+                                        <label for="Monitor[Host]" class="col-sm-2 control-label">Nombre del host remoto</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control" id="Monitor[Host]">
+                                        </div>
+                                    </div>
+
+                                    <!-- Puerto del host remoto -->
+                                    <div class="form-group">
+                                        <label for="Monitor[Port]" class="col-sm-2 control-label">Puerto del host remoto</label>
+                                        <div class="col-sm-2">
+                                            <input type="text" class="form-control" id="Monitor[Port]" value="80">
+                                        </div>
+                                    </div>
+
+                                    <!-- Nombre de ruta del host -->
+                                    <div class="form-group">
+                                        <label for="Monitor[Path]" class="col-sm-2 control-label">Nombre de ruta del host</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control" id="Monitor[Path]">
+                                        </div>
+                                    </div>
+
+                                    <!-- Target colorspace -->
+                                    <div class="form-group">
+                                        <label for="Monitor[Colours]" class="col-sm-2 control-label">Espacio de color del objetivo</label>
+                                        <div class="col-sm-4">
+                                            <select id="Monitor[Colours]" class="form-control">
+                                                <option value="1">Grises 8 bits</option>
+                                                <option value="3" selected="selected">Color 24 bits</option>
+                                                <option value="4">Color 32 bits</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Ancho de captura (píxeles) -->
+                                    <div class="form-group">
+                                        <label for="Monitor[Width]" class="col-sm-2 control-label">Ancho de captura (píxeles)</label>
+                                        <div class="col-sm-2">
+                                            <input type="text" class="form-control" id="Monitor[Width]" value="320">
+                                        </div>
+                                    </div>
+
+                                    <!-- Altura de captura (píxeles) -->
+                                    <div class="form-group">
+                                        <label for="Monitor[Height]" class="col-sm-2 control-label">Altura de captura (píxeles)</label>
+                                        <div class="col-sm-2">
+                                            <input type="text" class="form-control" id="Monitor[Height]" value="240">
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <!--
+                                <div class="tab-pane fade" id="tab_3">
+                                    <p>333</p>
+                                </div>
+                                <div class="tab-pane fade" id="tab_4">
+                                    <p>444</p>
+                                </div>
+                                <div class="tab-pane fade" id="tab_5">
+                                    <p>555</p>
+                                </div>
+                                -->
+                            </div>  
+
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-4">
+                                <button id="btnGuardarMonitor" type="button" class="btn btn-default">Guardar</button> 
+                                <a href='index.html' class='btn btn-primary'>Cancelar</a>
+                                </div>
+                            </div>                          
+                        </form>
+                
+                    </div> <!-- /contenido -->
+                </div> <!-- /div class="panel-body" -->
+                <div class="panel-footer"></div>
+	        </div> <!-- /div class="panel panel-primary" -->
+
+        </div>
+        <!-- /.container -->
+        
+        
+        <script src="js/Lista.js"></script>
+    </body>
+</html>
