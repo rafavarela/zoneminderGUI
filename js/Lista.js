@@ -1,5 +1,5 @@
-﻿// var dominio = "http://zm.app/";
-var dominio = "http://192.168.1.66/";
+﻿var dominio = "http://zm.app/";
+// var dominio = "http://192.168.1.66/";
 
 window.onload = function () 
 {    
@@ -14,45 +14,49 @@ window.onload = function ()
             idMonitor = obtenerIdMonitor(url);
             obtenerMonitor(idMonitor);
             document.getElementById("btnGuardarMonitor").onclick = function () {  
-                // Editar registro
-                // alert('editar');
                 idMonitor = obtenerIdMonitor(url);
                 editarMonitor(idMonitor);
             }
+            // Programar boton de borrar
+            document.getElementById("btnEliminarMonitor").onclick = function () {                  
+                if (confirm("Confirma borrado de monitor actual?")) {
+                    eliminarMonitor(idMonitor);
+                    // alert("si");
+                }
+            }
         } else {
             // Adicionar registro
-            actualizarMetodos(); // llenado del combo de metodos remotos
-            
-            document.getElementById("btnGuardarMonitor").onclick = function () {  
-                // Adicionar registro
-                // alert('adicionar');                
+            actualizarMetodos(); // llenado del combo de metodos remotos            
+            document.getElementById("btnGuardarMonitor").onclick = function () {                  
                 if (validarEntradas()) agregarMonitor();
             }
+            // Ocultar botón de eliminar
+            document.getElementById("btnEliminarMonitor").style.visibility = "hidden";
         }
     } else {
         // es el index (Se deben listar los monitores)
         var url = dominio + "zm/api/monitors.json";
-        requestServer(url, "get", mostrarMonitores);
+        requestServer("get", url, mostrarMonitores);
     }
 
     // Código para controlar los tabs //
     var menuItems = document.querySelectorAll('#menuTabs>li');
     for (var i = 0; i < menuItems.length; i++) {
         menuItems[i].addEventListener("click", function(){
-            // occulting divs - removing .active class
+            // Ocultar divs - removiendo clase .active
             var tabs = document.querySelectorAll('.tab-content>.tab-pane');
             for (var k = 0; k < tabs.length; k++) {
                 tabs[k].className = "tab-pane";
             }
-            // removing .active from menu itens
+            // removiendo .active de items de menu
             for (var j = 0; j < menuItems.length; j++) {
                 menuItems[j].className = "";
             }
-            // setting .active in clicked item
+            // colocar clase .active en la pestaña clickeada
             this.className = "active";
-            // getting target id
+            // obtener id
             var linkTab = this.getElementsByTagName("A")[0].id;
-            // showing the selected tab div
+            // mostrar el tab div seleccionado
             var tab = document.querySelectorAll('.tab-content>#'+linkTab)[0];
             tab.className = "tab-pane active";
         });
@@ -76,32 +80,24 @@ function obtenerIdMonitor(url)
     return id;
 }
 
-function requestServer(url, metodo, funcionCallBack, texto) 
+function requestServer(metodo, url, funcionCallBack, texto, asincronico = true) 
 {
+    //console.log(asincronico);
     var xhr = new XMLHttpRequest();
+    xhr.open(metodo, url, asincronico);
 
-    // Según el depurador de Firefox, primero hay que abrir la conexion y 
-    // después configurar el content-type
-    xhr.open(metodo, url);
-
-    // 05/abril/2017. Si el metodo es POST, establecer  
-    // Content-Type en application/x-www-form-urlencoded 
-    // || metodo == "put"
+    // Si el metodo es POST o PUT, cambiar Content-Type a application/x-www-form-urlencoded 
     if (metodo == "post" || metodo == "put")  {
         xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded; charset=UTF-8;');
     }
-    /*
-    if (metodo == "put")  {
-        xhr.setRequestHeader('Content-Type','text/plain; charset=UTF-8;');
-        texto = "Monitor[Name]=test1";
-    }
-    */
+    
     xhr.onreadystatechange = function () {
         if (xhr.status == 200 && xhr.readyState == 4) {
             funcionCallBack(xhr.responseText);
         }
     }
-    if (metodo == "get") xhr.send();
+    
+    if (metodo == "get" || metodo == "delete") xhr.send();
     else {
         // post o cualquier otro verbo
         console.log(texto);
@@ -158,7 +154,6 @@ function mostrarMonitores(respuestaTexto)
     html += "</div>"; // div class='panel-footer'
     html += "</div>"; // div class='panel panel-primary
 
-    // console.log(html);
     document.getElementById("contenidoModulo").innerHTML = html;
 }
 
@@ -208,7 +203,7 @@ function agregarMonitor ()
     var MonitorPort     = document.getElementById("Monitor[Port]").value;
     var MonitorPath     = document.getElementById("Monitor[Path]").value;
     var MonitorColours  = document.getElementById("Monitor[Colours]").value;
-    var MonitorWidth   = document.getElementById("Monitor[Width]").value;
+    var MonitorWidth    = document.getElementById("Monitor[Width]").value;
     var MonitorHeight   = document.getElementById("Monitor[Height]").value;
 
     parametros = agregarParametro(parametros, "Monitor[Name]", MonitorName);
@@ -225,7 +220,7 @@ function agregarMonitor ()
     parametros = agregarParametro(parametros, "Monitor[Width]", MonitorWidth);
     parametros = agregarParametro(parametros, "Monitor[Height]", MonitorHeight);
 
-    requestServer(url, "post", mostrarResultadoGrabar, parametros);
+    requestServer("post", url, mostrarResultadoGrabar, parametros);
 }
 
 function mostrarResultadoGrabar(rpta) 
@@ -233,7 +228,7 @@ function mostrarResultadoGrabar(rpta)
     if (rpta.indexOf("Undefined index: Type") > -1) rpta = "";
 
     if (rpta == "") {
-        // document.getElementById("spnMensaje").innerHTML = "Registro guardado en la base de datos!";
+        // Registro guardado en la base de datos!";
         window.location.replace("index.html");
     } else  {
         document.getElementById("spnMensaje").innerHTML = rpta;
@@ -243,12 +238,14 @@ function mostrarResultadoGrabar(rpta)
 function listarServidores() 
 {
     var url = dominio + "zm/index.php?view=options&tab=servers";
-    requestServer(url, "get", obtenerServidores);    
+    /* Este metodo NO es asincrónico porque necesito tener el listado de servidores
+        para poder asignarle el valor pertinente al combo */
+    requestServer("get", url, obtenerServidores, "", false);    
 }
 
 function obtenerServidores(respuestaTexto) 
 {
-    var html = '<option value="" selected="selected">Ninguno</option>';
+    var html = '<option value="0" selected="selected">Ninguno</option>';
 
     var longitud_tag_tbody_inicio = 7;
     var longitud_tag_tbody_fin = 8;
@@ -277,9 +274,7 @@ function obtenerServidores(respuestaTexto)
         html += '">';
         html += nombreServidor;
         html += '</option>';
-
-    }   
-    
+    }
     document.getElementById("Monitor[ServerId]").innerHTML = html;
 }
 
@@ -304,7 +299,7 @@ function actualizarMetodos()
 function obtenerMonitor(idMonitor) 
 {
     var url = dominio + "zm/api/monitors/" + idMonitor + ".json";
-    requestServer(url, "get", llenarValoresMonitor);
+    requestServer("get", url, llenarValoresMonitor);
 }
 
 function llenarValoresMonitor(respuestaTexto) 
@@ -313,7 +308,7 @@ function llenarValoresMonitor(respuestaTexto)
         
     var Monitor = objMonitor.monitor.Monitor;
     document.getElementById("Monitor[Name]").value = Monitor.Name;
-    document.getElementById("Monitor[ServerId]").value = Monitor.ServerId;
+    document.getElementById("Monitor[ServerId]").value = (Monitor.ServerId == null || Monitor.ServerId == "") ? Monitor.ServerId = "0" : Monitor.ServerId;
     document.getElementById("Monitor[Type]").value = Monitor.Type;
     document.getElementById("Monitor[Function]").value = Monitor.Function;
     document.getElementById("Monitor[Enabled]").checked = Monitor.Enabled * 1; // Para que el valor se vuelva numerico
@@ -328,25 +323,30 @@ function llenarValoresMonitor(respuestaTexto)
     document.getElementById("Monitor[Height]").value = Monitor.Height;
 }
 
+function eliminarMonitor(idMonitor)
+{
+    var url = dominio + "zm/api/monitors/" + idMonitor + ".json";
+    requestServer("delete", url, mostrarResultadoGrabar); 
+}
+
 function editarMonitor(idMonitor) 
 {
-    
     var url = dominio + "zm/api/monitors/" + idMonitor + ".json";
     
-    // alert("url: "+url);
-    // document.getElementById("spnMensaje").innerHTML = "url: "+url;
-
     var parametros = "";
     parametros = agregarParametro(parametros, "Monitor[Name]", document.getElementById("Monitor[Name]").value);
+    parametros = agregarParametro(parametros, "Monitor[ServerId]", document.getElementById("Monitor[ServerId]").value);
+    parametros = agregarParametro(parametros, "Monitor[Type]", document.getElementById("Monitor[Type]").value);
+    parametros = agregarParametro(parametros, "Monitor[Function]", document.getElementById("Monitor[Function]").value);
+    // El valor de la casilla se saca de la propiedad checked y NO de value
+    parametros = agregarParametro(parametros, "Monitor[Enabled]", document.getElementById("Monitor[Enabled]").checked * 1);
+    parametros = agregarParametro(parametros, "Monitor[Protocol]", document.getElementById("Monitor[Protocol]").value);
+    parametros = agregarParametro(parametros, "Monitor[Method]", document.getElementById("Monitor[Method]").value);
+    parametros = agregarParametro(parametros, "Monitor[Host]", document.getElementById("Monitor[Host]").value);
+    parametros = agregarParametro(parametros, "Monitor[Port]", document.getElementById("Monitor[Port]").value);
+    parametros = agregarParametro(parametros, "Monitor[Colours]", document.getElementById("Monitor[Colours]").value);
+    parametros = agregarParametro(parametros, "Monitor[Width]", document.getElementById("Monitor[Width]").value);
+    parametros = agregarParametro(parametros, "Monitor[Height]", document.getElementById("Monitor[Height]").value);
 
-    // document.getElementById("spnMensaje").innerHTML = "parametros: "+parametros;
-
-    requestServer(url, "put", mostrarResultadoGrabar, parametros);    
+    requestServer("put", url, mostrarResultadoGrabar, parametros);    
 }
-
-/*
-function actualizarMonitor(respuestaTexto)
-{
-
-}
-*/
