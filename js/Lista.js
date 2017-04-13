@@ -92,7 +92,7 @@ function requestServer(url, metodo, funcionCallBack, texto)
     }
     if (metodo == "put")  {
         xhr.setRequestHeader('Content-Type','text/plain; charset=UTF-8;');
-        // texto = "Monitor[Name]=test1";
+        texto = "Monitor[Name]=test1";
     }
     
     xhr.onreadystatechange = function () {
