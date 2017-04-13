@@ -1,4 +1,7 @@
-﻿window.onload = function () 
+﻿// var dominio = "http://zm.app/";
+var dominio = "http://192.168.1.66/";
+
+window.onload = function () 
 {    
     var url = window.location.href;    
     var idMonitor = "";
@@ -28,7 +31,7 @@
         }
     } else {
         // es el index (Se deben listar los monitores)
-        var url = "http://zm.app/zm/api/monitors.json";
+        var url = dominio + "zm/api/monitors.json";
         requestServer(url, "get", mostrarMonitores);
     }
 
@@ -89,7 +92,7 @@ function requestServer(url, metodo, funcionCallBack, texto)
     }
     if (metodo == "put")  {
         xhr.setRequestHeader('Content-Type','text/plain; charset=UTF-8;');
-        texto = "Monitor[Name]=test1";
+        // texto = "Monitor[Name]=test1";
     }
     
     xhr.onreadystatechange = function () {
@@ -190,7 +193,7 @@ function agregarParametro(sParams, sParamName, sParamValue)
 
 function agregarMonitor () 
 {
-    var url = "http://zm.app/zm/api/monitors.json";
+    var url = dominio + "zm/api/monitors.json";
     var parametros = "";
     
     var MonitorName     = document.getElementById("Monitor[Name]").value;
@@ -238,7 +241,7 @@ function mostrarResultadoGrabar(rpta)
 
 function listarServidores() 
 {
-    var url = "http://zm.app/index.php?view=options&tab=servers";
+    var url = dominio + "index.php?view=options&tab=servers";
     requestServer(url, "get", obtenerServidores);    
 }
 
@@ -299,7 +302,7 @@ function actualizarMetodos()
 
 function obtenerMonitor(idMonitor) 
 {
-    var url = "http://zm.app/zm/api/monitors/" + idMonitor + ".json";
+    var url = dominio + "zm/api/monitors/" + idMonitor + ".json";
     requestServer(url, "get", llenarValoresMonitor);
 }
 
@@ -327,7 +330,7 @@ function llenarValoresMonitor(respuestaTexto)
 function editarMonitor(idMonitor) 
 {
     
-    var url = "http://zm.app/zm/api/monitors/" + idMonitor + ".json";
+    var url = dominio + "zm/api/monitors/" + idMonitor + ".json";
     
     // alert("url: "+url);
     // document.getElementById("spnMensaje").innerHTML = "url: "+url;
