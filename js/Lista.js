@@ -241,7 +241,7 @@ function mostrarResultadoGrabar(rpta)
 
 function listarServidores() 
 {
-    var url = dominio + "index.php?view=options&tab=servers";
+    var url = dominio + "zm/index.php?view=options&tab=servers";
     requestServer(url, "get", obtenerServidores);    
 }
 
