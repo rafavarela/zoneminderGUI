@@ -87,14 +87,15 @@ function requestServer(url, metodo, funcionCallBack, texto)
     // 05/abril/2017. Si el metodo es POST, establecer  
     // Content-Type en application/x-www-form-urlencoded 
     // || metodo == "put"
-    if (metodo == "post")  {
+    if (metodo == "post" || metodo == "put")  {
         xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded; charset=UTF-8;');
     }
+    /*
     if (metodo == "put")  {
         xhr.setRequestHeader('Content-Type','text/plain; charset=UTF-8;');
         texto = "Monitor[Name]=test1";
     }
-    
+    */
     xhr.onreadystatechange = function () {
         if (xhr.status == 200 && xhr.readyState == 4) {
             funcionCallBack(xhr.responseText);
