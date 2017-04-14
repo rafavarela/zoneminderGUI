@@ -1,5 +1,4 @@
-﻿var dominio = "http://zm.app/";
-// var dominio = "http://192.168.1.66/";
+﻿var dominio = "http://zm.app";
 
 window.onload = function () 
 {    
@@ -21,7 +20,6 @@ window.onload = function ()
             document.getElementById("btnEliminarMonitor").onclick = function () {                  
                 if (confirm("Confirma borrado de monitor actual?")) {
                     eliminarMonitor(idMonitor);
-                    // alert("si");
                 }
             }
         } else {
@@ -34,9 +32,15 @@ window.onload = function ()
             document.getElementById("btnEliminarMonitor").style.visibility = "hidden";
         }
     } else {
-        // es el index (Se deben listar los monitores)
-        var url = dominio + "zm/api/monitors.json";
-        requestServer("get", url, mostrarMonitores);
+        if(url.indexOf("visor") > -1) {
+            idMonitor = obtenerIdMonitor(url);
+            var url = dominio + "/index.php?view=watch&mid=" + idMonitor;
+            requestServer("get", url, mostrarVideo);
+        } else {
+            // es el index (Se deben listar los monitores)
+            var url = dominio + "/zm/api/monitors.json";
+            requestServer("get", url, mostrarMonitores);
+        }
     }
 
     // Código para controlar los tabs //
@@ -131,16 +135,22 @@ function mostrarMonitores(respuestaTexto)
     */
     html += "</tr></thead><tbody>";
 
-    // Registros
+    // Registros de la cuadricula
     for(var i = 0; i < objMonitores.monitors.length; i++) {        
         html += "<tr>";
-        html += "<td>" + objMonitores.monitors[i].Monitor.Name + "</td>";
+        // Columna nombre con enlace al visor
+        html += "<td><a href='visor.html?id=";
+        html += objMonitores.monitors[i].Monitor.Id + "' target='_blank'>";
+        html += objMonitores.monitors[i].Monitor.Name + "</a></td>";;
+
+        // Columna de función
         html += "<td>" + objMonitores.monitors[i].Monitor.Function + "</td>";
-        html += "<td>" ;
-        html += "<a href='formularioMonitor.html?id=";
-        html += objMonitores.monitors[i].Monitor.Id;
-        html += "'>";
+        
+        // Columna del host origen con enlace al formulario de edición
+        html += "<td><a href='formularioMonitor.html?id=";
+        html += objMonitores.monitors[i].Monitor.Id + "'>";
         html += objMonitores.monitors[i].Monitor.Host + "</a></td>";
+       
         html += "</tr>";
     }
     html += "</tbody></table>";
@@ -189,7 +199,7 @@ function agregarParametro(sParams, sParamName, sParamValue)
 
 function agregarMonitor () 
 {
-    var url = dominio + "zm/api/monitors.json";
+    var url = dominio + "/zm/api/monitors.json";
     var parametros = "";
     
     var MonitorName     = document.getElementById("Monitor[Name]").value;
@@ -237,7 +247,7 @@ function mostrarResultadoGrabar(rpta)
 
 function listarServidores() 
 {
-    var url = dominio + "zm/index.php?view=options&tab=servers";
+    var url = dominio + "/zm/index.php?view=options&tab=servers";
     /* Este metodo NO es asincrónico porque necesito tener el listado de servidores
         para poder asignarle el valor pertinente al combo */
     requestServer("get", url, obtenerServidores, "", false);    
@@ -298,7 +308,7 @@ function actualizarMetodos()
 
 function obtenerMonitor(idMonitor) 
 {
-    var url = dominio + "zm/api/monitors/" + idMonitor + ".json";
+    var url = dominio + "/zm/api/monitors/" + idMonitor + ".json";
     requestServer("get", url, llenarValoresMonitor);
 }
 
@@ -325,13 +335,13 @@ function llenarValoresMonitor(respuestaTexto)
 
 function eliminarMonitor(idMonitor)
 {
-    var url = dominio + "zm/api/monitors/" + idMonitor + ".json";
+    var url = dominio + "/zm/api/monitors/" + idMonitor + ".json";
     requestServer("delete", url, mostrarResultadoGrabar); 
 }
 
 function editarMonitor(idMonitor) 
 {
-    var url = dominio + "zm/api/monitors/" + idMonitor + ".json";
+    var url = dominio + "/zm/api/monitors/" + idMonitor + ".json";
     
     var parametros = "";
     parametros = agregarParametro(parametros, "Monitor[Name]", document.getElementById("Monitor[Name]").value);
@@ -349,4 +359,21 @@ function editarMonitor(idMonitor)
     parametros = agregarParametro(parametros, "Monitor[Height]", document.getElementById("Monitor[Height]").value);
 
     requestServer("put", url, mostrarResultadoGrabar, parametros);    
+}
+
+function mostrarVideo(respuestaTexto) {
+    
+    var posIni = respuestaTexto.indexOf('<img id="liveStream"');
+    var posFin = respuestaTexto.indexOf('height="') + 17;
+    var enlaceVideoTmp = respuestaTexto.substring(posIni, posFin);
+    
+    posFin = enlaceVideoTmp.indexOf('/>') + 2;  
+    enlaceVideoTmp = enlaceVideoTmp.substring(0, posFin);
+
+    var posSrc = enlaceVideoTmp.indexOf('src="') + 5;
+
+    var EnlaceParteA = enlaceVideoTmp.substring(0, posSrc);
+    var EnlaceParteB = enlaceVideoTmp.substring(posSrc);
+
+    document.getElementById("contenidoModulo").innerHTML = EnlaceParteA + dominio + EnlaceParteB;
 }
