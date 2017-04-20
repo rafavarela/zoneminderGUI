@@ -1,5 +1,7 @@
 ﻿var dominio = "http://zm.app";
 
+// Prueba de actualizacion de git
+
 window.onload = function () 
 {    
     var url = window.location.href;    
